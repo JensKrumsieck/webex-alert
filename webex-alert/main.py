@@ -39,11 +39,11 @@ print("Logged in as " + res.json()["displayName"])
 
 emails = []
 # get all emails
-# webex.getAllEmails(accesstoken) # uncomment to update all emails
-#with open("emails.txt", "r") as f:
-#    emails = f.readlines()
+webex.getAllEmails(accesstoken) # uncomment to update all emails
+with open("emails.txt", "r") as f:
+    emails = f.readlines()
 
-emails = ["jens.krumsieck@thuenen.de"] # testing purpose, DANGER: if this line is commented you'll add whole thünen to room!!! 
+# emails = [] # testing purpose, DANGER: if this line is commented you'll add whole thünen to room!!! 
 
 # create room if not stored already
 room_id = ""
@@ -52,7 +52,7 @@ if os.path.exists(".room_id"):
     with open(".room_id", "r") as f:
         room_id = f.readline()
 
-public_room = False # set to true for production
+public_room = True # set to true for production
 
 if not room_id:
     options= {"title": "IT Security Alerts", "isLocked": True, "isPublic": public_room, "isAnnouncementOnly": True, "description": "This Room is used to broadcast IT Security Alerts"}

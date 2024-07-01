@@ -1,5 +1,7 @@
 .secrets
+.room_id
 emails.txt
+.env_example
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
