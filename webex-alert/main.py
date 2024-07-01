@@ -1,8 +1,14 @@
 from dotenv import dotenv_values
-import server
 import requests
+from login import login
 
-bearerToken = dotenv_values(".env").get("BEARER_TOKEN")
+config = dotenv_values(".env")
+bearerToken = config.get("ACCESS_TOKEN")
+if not bearerToken:
+    accesstoken, refreshtoken = login()
+    with open(".env", "w") as f:
+        f.write(f"ACCESS_TOKEN={accesstoken}\n")
+        f.write(f"REFRESH_TOKEN={refreshtoken}\n")
 
 if not bearerToken: 
     app = server.app()
