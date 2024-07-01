@@ -3,8 +3,9 @@ Creates an Alert Room for Webex and adds all colleagues to it. The Room is a bro
 
 Upon the first run the script will ask for authentification. Click the provided link to login to Webex. Access and Refresh Tokens will be stored in a .secrets file. 
 
->[!WARNING] 
->DANGER! This will add all Colleagues to a room, uncomment line 46 in main.py for testing!!!
+> **[- WARNING -]**
+>
+> **[- DANGER! This will add all Colleagues to a room,uncomment line 46 in main.py for testing!!! -]**
 
 ## Steps:
  - authenticate User
