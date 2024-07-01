@@ -18,7 +18,6 @@ Copy client id and client secret in a file called .env, like in the example:
 ```env
 CLIENT_ID=your_client_id
 CLIENT_SECRET=your_client_secret
-
 ```
 
 2. Install requirements
