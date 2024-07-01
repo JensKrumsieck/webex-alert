@@ -1,37 +1,68 @@
 from dotenv import dotenv_values
 import requests
-from login import login
+import webex
+from login import login, refresh
+import os
 
-config = dotenv_values(".env")
-bearerToken = config.get("ACCESS_TOKEN")
-if not bearerToken:
+accesstoken = ""
+refreshtoken = ""
+
+# login or read tokens
+if os.path.exists(".secrets"):
+    secrets = dotenv_values(".secrets")
+    refreshtoken = secrets.get("REFRESH_TOKEN")
+    accesstoken = secrets.get("ACCESS_TOKEN")
+else:
     accesstoken, refreshtoken = login()
-    with open(".env", "w") as f:
+    with open(".secrets", "w") as f:
         f.write(f"ACCESS_TOKEN={accesstoken}\n")
         f.write(f"REFRESH_TOKEN={refreshtoken}\n")
 
-if not bearerToken: 
-    app = server.app()
-    app.run()
-    bearerToken = app.token
-    with open(".env", "a") as f:
-        f.write(f"BEARER_TOKEN={bearerToken}\n")
+# check valid token
+res = requests.get("https://webexapis.com/v1/people/me",
+                   headers={"Authorization": f"Bearer {accesstoken}"})
+if res.status_code == 401:
+    # use refresh token
+    accesstoken, refreshtoken = refresh(refreshtoken)
+    with open(".secrets", "w") as f:
+        f.write(f"ACCESS_TOKEN={accesstoken}\n")
+        f.write(f"REFRESH_TOKEN={refreshtoken}\n")
 
-res = requests.get("https://webexapis.com/v1/people/me", headers={"Authorization": f"Bearer {bearerToken}"})
-print("logged in as " + res.json()["displayName"])
+res = requests.get("https://webexapis.com/v1/people/me",
+                   headers={"Authorization": f"Bearer {accesstoken}"})
+if res.status_code != 200:
+    print("Could not authenticate, please try again")
+    os.remove(".secrets")
+    exit()
 
-# TODO: cache id after first run
-room = requests.post("https://webexapis.com/v1/rooms", headers={"Authorization": f"Bearer {bearerToken}"}, json={"title": "Test"}).json() # TODO: options for room
+print("Logged in as " + res.json()["displayName"])
 
-emails = ["jens.krumsieck@thuenen.de"]
+emails = []
+# get all emails
+# webex.getAllEmails(accesstoken) # uncomment to update all emails
+#with open("emails.txt", "r") as f:
+#    emails = f.readlines()
 
-users = []
-for mail in emails:
-    user = requests.get(f"https://webexapis.com/v1/people?email={mail}", headers={"Authorization": f"Bearer {bearerToken}"}).json()
-    if user["items"]:
-        users.append(user["items"][0]["id"])
-    else:
-        print(f"User with email {mail} not found")
+emails = ["jens.krumsieck@thuenen.de"] # testing purpose, DANGER: if this line is commented you'll add whole thünen to room!!! 
 
-for users in users:
-    requests.post("https://webexapis.com/v1/memberhips", headers={"Authorization": f"Bearer {bearerToken}"}, json={"roomId": room["id"], "personId": user})
+# create room if not stored already
+room_id = ""
+
+if os.path.exists(".room_id"):
+    with open(".room_id", "r") as f:
+        room_id = f.readline()
+
+public_room = False # set to true for production
+
+if not room_id:
+    options= {"title": "IT Security Alerts", "isLocked": True, "isPublic": public_room, "isAnnouncementOnly": True, "description": "This Room is used to broadcast IT Security Alerts"}
+    room = webex.createRoom(options, accesstoken)
+    with open(".room_id", "w") as f:
+        f.write(room["id"])
+    room_id = room["id"]
+
+# add users to room by their Ids
+users = webex.getUserIds(emails, accesstoken)
+
+for user in users:
+    webex.addUserToRoom(user, room_id, accesstoken)

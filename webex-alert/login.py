@@ -1,17 +1,22 @@
 from typing import Tuple
+from dotenv import dotenv_values
 import requests
 import serve
 
+token_url = "https://webexapis.com/v1/access_token"
+
+def read_secrets() -> Tuple[str, str]:    
+    config = dotenv_values(".env")
+    client_id = config.get("CLIENT_ID")
+    client_secret = config.get("CLIENT_SECRET")
+    return (client_id, client_secret)
+
 def login() -> Tuple[str, str]:
-    # TODO: get from env
-    client_id = "C0822806d1b484c90e50f08bc12022fc1c23d1cee232b4a56b4207f349c05d9f7"
-    # TODO: get from env
-    client_secret = "226f416d9b338da9439ced1e98ad3575c9efbb0b296f3cbc9035d4cfac16f952"
+    client_id, client_secret = read_secrets()
     scope = "spark:all%20spark:kms"
     redirect_url = "http://localhost:8080/auth"
     auth_url = f"https://webexapis.com/v1/authorize?client_id={
         client_id}&response_type=code&redirect_uri={redirect_url}&scope={scope}"
-    login_url = "https://webexapis.com/v1/access_token"
 
     # get auth code by logging in
     print(f"Please Login to Webex by visiting {auth_url}")
@@ -25,9 +30,29 @@ def login() -> Tuple[str, str]:
         "code": auth_code,
         "redirect_uri": redirect_url
     }
-    response = requests.post(login_url, data=options)
-    access_token = response.json()["access_token"] 
+    response = requests.post(token_url, data=options)
+    access_token = response.json()["access_token"]
     refresh_token = response.json()["refresh_token"]
 
     print("Login successful!")
+    return (access_token, refresh_token)
+
+
+def refresh(refreshToken: str) -> Tuple[str, str]:
+
+    client_id, client_secret = read_secrets()
+
+     # get access token and refresh token
+    options = {
+        "grant_type": "refresh_token",
+        "client_id": client_id,
+        "client_secret": client_secret,
+        "refresh_token": refreshToken
+    }
+
+    response = requests.post(token_url, data=options)
+    access_token = response.json()["access_token"]
+    refresh_token = response.json()["refresh_token"]
+
+    print("Got new token by using refresh token")
     return (access_token, refresh_token)
