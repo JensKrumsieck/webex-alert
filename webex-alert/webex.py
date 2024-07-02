@@ -38,4 +38,4 @@ def getUserIds(emails: List[str], accesstoken: str) -> List[str]:
     return users
 
 def addUserToRoom(user_id: str, room_id: str, accesstoken: str):
-    return requests.post("https://webexapis.com/v1/memberhips", headers={"Authorization": f"Bearer {accesstoken}"}, json={"roomId": room_id, "personId": user_id})
+    return requests.post("https://webexapis.com/v1/memberships", headers={"Authorization": f"Bearer {accesstoken}"}, json={"roomId": room_id, "personId": user_id})
