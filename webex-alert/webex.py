@@ -37,5 +37,27 @@ def getUserIds(emails: List[str], accesstoken: str) -> List[str]:
             print(f"User with email {mail} not found")
     return users
 
+def getRoomUserIds(room_id: str, accestoken: str):
+    response = requests.get("https://webexapis.com/v1/memberships", headers={"Authorization": f"Bearer {accestoken}"}, params={"roomId": room_id})
+    if(response.status_code != 200):
+        print("could not get room users")
+        return []
+    return [user["personId"] for user in response.json()["items"]]
+                                                                         
 def addUserToRoom(user_id: str, room_id: str, accesstoken: str):
-    return requests.post("https://webexapis.com/v1/memberships", headers={"Authorization": f"Bearer {accesstoken}"}, json={"roomId": room_id, "personId": user_id})
+    return requests.post("https://webexapis.com/v1/memberships", headers={"Authorization": f"Bearer {accesstoken}"}, 
+                         json={"roomId": room_id, "personId": user_id})
+
+def grantModeratorRightsInRoom(user_id: str, room_id: str, accesstoken: str):
+    # get membership id
+    response = requests.get("https://webexapis.com/v1/memberships", headers={"Authorization": f"Bearer {accesstoken}"}, params={"roomId": room_id, "personId": user_id})
+    response_json = response.json()
+    if response.status_code != 200 or not response_json["items"] or len(response_json["items"]) == 0:
+        print(f"could not get membership id for {user_id} in room")
+        response.status_code = 404 # manually set to 404
+        return response
+    membership_id = response.json()["items"][0]["id"]
+    
+    # grant moderator rights
+    return requests.put(f"https://webexapis.com/v1/memberships/{membership_id}", headers={"Authorization": f"Bearer {accesstoken}"}, 
+                        json={"isModerator": True})

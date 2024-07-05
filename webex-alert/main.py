@@ -36,14 +36,13 @@ if res.status_code != 200:
     exit()
 
 print("Logged in as " + res.json()["displayName"])
-
 emails = []
 # get all emails
 #webex.getAllEmails(accesstoken) # uncomment to update all emails
 #with open("emails.txt", "r") as f:
 #    emails = f.readlines()
 
-emails = ["jens.krumsieck@thuenen.de", "florian.hoedt@thuenen.de", "harald.vonwaldow@thuenen.de"] # testing purpose, DANGER: if this line is commented you'll add whole thünen to room!!! 
+emails = ["jens.krumsieck@thuenen.de"]#, "florian.hoedt@thuenen.de", "harald.vonwaldow@thuenen.de"] # testing purpose, DANGER: if this line is commented you'll add whole thünen to room!!! 
 
 # create room if not stored already
 room_id = ""
@@ -52,18 +51,37 @@ if os.path.exists(".room_id"):
     with open(".room_id", "r") as f:
         room_id = f.readline()
 
-public_room = False # set to true for production
-
 if not room_id:
-    options= {"title": "IT Security Alerts", "isLocked": True, "isPublic": public_room, "isAnnouncementOnly": True, "description": "This Room is used to broadcast IT Security Alerts"}
+    options= {"title": "[Test] IT Security Alerts", "isLocked": True, "isPublic": False, "isAnnouncementOnly": True, "description": "This Room is used to broadcast IT Security Alerts"}
     room = webex.createRoom(options, accesstoken)
     with open(".room_id", "w") as f:
         f.write(room["id"])
     room_id = room["id"]
 
 # add users to room by their Ids
-users = webex.getUserIds(emails, accesstoken)
+user_ids = webex.getUserIds(emails, accesstoken)
+print(f"Found {len(user_ids)} users")
 
-for user in users:
-    x = webex.addUserToRoom(user, room_id, accesstoken)
-    print(x)
+# get users already in that room
+room_users_ids = webex.getRoomUserIds(room_id, accesstoken)
+print(len(room_users_ids), "users already in room")
+
+user_ids = list(set(user_ids) - set(room_users_ids))
+print(len(user_ids), "users to add")
+
+# add remaining users to room
+for user_id in user_ids:
+    res = webex.addUserToRoom(user_id, room_id, accesstoken)
+    if res.status_code != 200:
+        print(f"Could not add user {user_id} to room - statuscode: {res.status_code}")
+
+# (re-)grant mod rights
+special_users = ["jens.krumsieck@thuenen.de", "florian.hoedt@thuenen.de", "helge.ziese@thuenen.de", "beate.oerder@thuenen.de", "thomas.firley@thuenen.de"]
+special_ids = webex.getUserIds(special_users, accesstoken)
+
+for user_id in special_ids:
+    res = webex.grantModeratorRightsInRoom(user_id, room_id, accesstoken)
+    if res.status_code != 200:
+        print(f"Could not grant user {user_id} moderator rights - statuscode: {res.status_code}")
+    else:
+        print(f"Granted user {user_id} moderator rights")
