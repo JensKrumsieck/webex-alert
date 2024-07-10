@@ -39,11 +39,12 @@ print("Logged in as " + res.json()["displayName"])
 emails = []
 
 # get all emails
-#webex.getAllEmails(accesstoken) # uncomment to update all emails
-#with open("emails.txt", "r") as f:
-#    emails = f.readlines()
+#emails = webex.getAllEmails(accesstoken) # uncomment to update all emails
 
+# get emails for specific rooms
 #emails = webex.getRoomUserEmails(webex.roomIds["FDM"], accesstoken) # test with different rooms, options: "FDM", "44er", "IT"
+
+# hardcoded list of emails
 emails = ["jens.krumsieck@thuenen.de"]#, "florian.hoedt@thuenen.de", "harald.vonwaldow@thuenen.de"] # testing purpose, DANGER: if this line is commented you'll add whole thünen to room!!! 
 
 # create room if not stored already

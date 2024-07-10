@@ -20,7 +20,9 @@ def getAllEmails(accesstoken: str):
     print(f"Found {len(emails)} emails")
     with open("emails.txt", "w") as f:
         for email in emails:
-            f.write(email + "\n")
+            f.write(email + "\n")            
+    return emails
+
 roomIds = {
     "FDM": "Y2lzY29zcGFyazovL3VybjpURUFNOmV1LWNlbnRyYWwtMV9rL1JPT00vNjQ4MDViODAtMDI3Yi0xMWVkLWI1ZDgtZmJlZWY5MzE2NGZh",
     "44er": "Y2lzY29zcGFyazovL3VybjpURUFNOmV1LWNlbnRyYWwtMV9rL1JPT00vYzFlMzNjMTAtZGU2NS0xMWViLThjMGYtY2ZiZWQzYmRiMDFi",
