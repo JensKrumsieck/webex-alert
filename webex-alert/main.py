@@ -4,7 +4,7 @@ import coloredlogs
 import webex
 from util import root_dir
 
-coloredlogs.install(level='DEBUG', fmt="%(asctime)s [%(levelname)s] %(name)s: %(message)s")
+coloredlogs.install(level='INFO', fmt="%(asctime)s [%(levelname)s] %(name)s: %(message)s")
 logger = logging.getLogger("webex-alert")
 
 logger.info("Starting Webex Alert Script")
@@ -15,10 +15,10 @@ emails = []
 #emails = webex.getAllEmails(accesstoken) # uncomment to update all emails
 
 # get emails for specific rooms
-#emails = webex.getRoomUserEmails(webex.roomIds["FDM"], accesstoken) # test with different rooms, options: "FDM", "44er", "IT"
+emails = webex.getRoomUserEmails(webex.roomIds["44er"], accesstoken) # test with different rooms, options: "FDM", "44er", "IT"
 
 # hardcoded list of emails
-emails = ["jens.krumsieck@thuenen.de"]#, "florian.hoedt@thuenen.de", "harald.vonwaldow@thuenen.de"] # testing purpose, DANGER: if this line is commented you'll add whole thünen to room!!! 
+# emails = ["jens.krumsieck@thuenen.de"]#, "florian.hoedt@thuenen.de", "harald.vonwaldow@thuenen.de"] # testing purpose, DANGER: if this line is commented you'll add whole thünen to room!!! 
 
 # create room if not stored already
 room_id = ""
@@ -28,7 +28,7 @@ if os.path.exists(root_dir + "/.room_id"):
         room_id = f.readline()
 
 if not room_id:
-    options= {"title": "[Test] IT Security Alerts", "isLocked": True, "isPublic": False, "isAnnouncementOnly": True, "description": "This Room is used to broadcast IT Security Alerts"}
+    options= {"title": "❗ [Test] Thünen IT Security Alerts ❗", "isLocked": True, "isPublic": False, "isAnnouncementOnly": True, "description": "This Room is used to broadcast IT Security Alerts"}
     room = webex.createRoom(options, accesstoken)
     with open(root_dir + "/.room_id", "w") as f:
         f.write(room["id"])
