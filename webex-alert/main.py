@@ -37,11 +37,13 @@ if res.status_code != 200:
 
 print("Logged in as " + res.json()["displayName"])
 emails = []
+
 # get all emails
 #webex.getAllEmails(accesstoken) # uncomment to update all emails
 #with open("emails.txt", "r") as f:
 #    emails = f.readlines()
 
+#emails = webex.get44erEmails(accesstoken) # test with 44er users
 emails = ["jens.krumsieck@thuenen.de"]#, "florian.hoedt@thuenen.de", "harald.vonwaldow@thuenen.de"] # testing purpose, DANGER: if this line is commented you'll add whole thünen to room!!! 
 
 # create room if not stored already
