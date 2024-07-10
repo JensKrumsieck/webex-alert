@@ -22,6 +22,11 @@ def getAllEmails(accesstoken: str):
         for email in emails:
             f.write(email + "\n")
 
+def get44erEmails(accesstoken: str):
+    roomId = "Y2lzY29zcGFyazovL3VybjpURUFNOmV1LWNlbnRyYWwtMV9rL1JPT00vYzFlMzNjMTAtZGU2NS0xMWViLThjMGYtY2ZiZWQzYmRiMDFi"
+    users = getRoomUsers(roomId, accesstoken)
+    return [user["personEmail"] for user in users]
+
 def createRoom(options, accesstoken: str):
     # creates a room
     return requests.post("https://webexapis.com/v1/rooms", headers={"Authorization": f"Bearer {accesstoken}"}, json=options).json()
@@ -37,12 +42,18 @@ def getUserIds(emails: List[str], accesstoken: str) -> List[str]:
             print(f"User with email {mail} not found")
     return users
 
-def getRoomUserIds(room_id: str, accestoken: str):
-    response = requests.get("https://webexapis.com/v1/memberships", headers={"Authorization": f"Bearer {accestoken}"}, params={"roomId": room_id})
+def getRoomUsers(room_id: str, accesstoken: str):
+    response = requests.get("https://webexapis.com/v1/memberships", headers={"Authorization": f"Bearer {accesstoken}"}, params={"roomId": room_id})
     if(response.status_code != 200):
         print("could not get room users")
         return []
-    return [user["personId"] for user in response.json()["items"]]
+    return response.json()["items"]
+
+def getRoomUserIds(room_id: str, accestoken: str):
+    users = getRoomUsers(room_id, accestoken)
+    if(users == []):
+        return []
+    return [user["personId"] for user in users]
                                                                          
 def addUserToRoom(user_id: str, room_id: str, accesstoken: str):
     return requests.post("https://webexapis.com/v1/memberships", headers={"Authorization": f"Bearer {accesstoken}"}, 
