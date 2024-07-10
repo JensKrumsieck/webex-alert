@@ -52,7 +52,7 @@ for user_id in user_ids:
         logger.error(f"Could not add user {user_id} to room - statuscode: {res.status_code}")
 
 # (re-)grant mod rights
-special_users = ["jens.krumsieck@thuenen.de", "florian.hoedt@thuenen.de", "helge.ziese@thuenen.de", "beate.oerder@thuenen.de", "thomas.firley@thuenen.de"]
+special_users = ["jens.krumsieck@thuenen.de", "florian.hoedt@thuenen.de", "harald.vonwaldow@thuenen.de", "helge.ziese@thuenen.de", "beate.oerder@thuenen.de", "thomas.firley@thuenen.de"]
 special_ids = webex.getUserIds(special_users, accesstoken)
 
 for user_id in special_ids:
