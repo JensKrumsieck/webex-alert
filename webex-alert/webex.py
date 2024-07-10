@@ -27,6 +27,11 @@ def get44erEmails(accesstoken: str):
     users = getRoomUsers(roomId, accesstoken)
     return [user["personEmail"] for user in users]
 
+def getITEmails(accesstoken: str):
+    roomId = "Y2lzY29zcGFyazovL3VybjpURUFNOmV1LWNlbnRyYWwtMV9rL1JPT00vYjIwZjczOTAtMTQ0OC0xMWViLWE1OTctYjk2N2FkNmJiOWNm"
+    users = getRoomUsers(roomId, accesstoken)
+    return [user["personEmail"] for user in users]
+
 def createRoom(options, accesstoken: str):
     # creates a room
     return requests.post("https://webexapis.com/v1/rooms", headers={"Authorization": f"Bearer {accesstoken}"}, json=options).json()

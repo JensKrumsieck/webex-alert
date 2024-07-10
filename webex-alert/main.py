@@ -44,6 +44,8 @@ emails = []
 #    emails = f.readlines()
 
 #emails = webex.get44erEmails(accesstoken) # test with 44er users
+#emails = webex.getITEmails(accesstoken) # test with IT Room users
+
 emails = ["jens.krumsieck@thuenen.de"]#, "florian.hoedt@thuenen.de", "harald.vonwaldow@thuenen.de"] # testing purpose, DANGER: if this line is commented you'll add whole thünen to room!!! 
 
 # create room if not stored already
