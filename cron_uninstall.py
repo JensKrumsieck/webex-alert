@@ -1,5 +1,5 @@
 from crontab import CronTab
-from __util import comment
+from cron_util import comment
 
 cron = CronTab(user=True)
 
