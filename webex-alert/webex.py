@@ -21,16 +21,11 @@ def getAllEmails(accesstoken: str):
     with open("emails.txt", "w") as f:
         for email in emails:
             f.write(email + "\n")
-
-def get44erEmails(accesstoken: str):
-    roomId = "Y2lzY29zcGFyazovL3VybjpURUFNOmV1LWNlbnRyYWwtMV9rL1JPT00vYzFlMzNjMTAtZGU2NS0xMWViLThjMGYtY2ZiZWQzYmRiMDFi"
-    users = getRoomUsers(roomId, accesstoken)
-    return [user["personEmail"] for user in users]
-
-def getITEmails(accesstoken: str):
-    roomId = "Y2lzY29zcGFyazovL3VybjpURUFNOmV1LWNlbnRyYWwtMV9rL1JPT00vYjIwZjczOTAtMTQ0OC0xMWViLWE1OTctYjk2N2FkNmJiOWNm"
-    users = getRoomUsers(roomId, accesstoken)
-    return [user["personEmail"] for user in users]
+roomIds = {
+    "FDM": "Y2lzY29zcGFyazovL3VybjpURUFNOmV1LWNlbnRyYWwtMV9rL1JPT00vNjQ4MDViODAtMDI3Yi0xMWVkLWI1ZDgtZmJlZWY5MzE2NGZh",
+    "44er": "Y2lzY29zcGFyazovL3VybjpURUFNOmV1LWNlbnRyYWwtMV9rL1JPT00vYzFlMzNjMTAtZGU2NS0xMWViLThjMGYtY2ZiZWQzYmRiMDFi",
+    "IT": "Y2lzY29zcGFyazovL3VybjpURUFNOmV1LWNlbnRyYWwtMV9rL1JPT00vYjIwZjczOTAtMTQ0OC0xMWViLWE1OTctYjk2N2FkNmJiOWNm"
+}
 
 def createRoom(options, accesstoken: str):
     # creates a room
@@ -59,7 +54,13 @@ def getRoomUserIds(room_id: str, accestoken: str):
     if(users == []):
         return []
     return [user["personId"] for user in users]
-                                                                         
+
+def getRoomUserEmails(room_id: str, accesstoken: str):
+    users = getRoomUsers(room_id, accesstoken)
+    if(users == []):
+        return []
+    return [user["personEmail"] for user in users]           
+
 def addUserToRoom(user_id: str, room_id: str, accesstoken: str):
     return requests.post("https://webexapis.com/v1/memberships", headers={"Authorization": f"Bearer {accesstoken}"}, 
                          json={"roomId": room_id, "personId": user_id})
