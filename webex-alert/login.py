@@ -2,7 +2,10 @@ from typing import Tuple
 from dotenv import dotenv_values
 import requests
 import serve
+import logging
 from util import root_dir
+
+logger = logging.getLogger("webex-alert:login")
 
 token_url = "https://webexapis.com/v1/access_token"
 
@@ -16,8 +19,7 @@ def login() -> Tuple[str, str]:
     client_id, client_secret = read_secrets()
     scope = "spark:all%20spark:kms"
     redirect_url = "http://localhost:8080/auth"
-    auth_url = f"https://webexapis.com/v1/authorize?client_id={
-        client_id}&response_type=code&redirect_uri={redirect_url}&scope={scope}"
+    auth_url = f"https://webexapis.com/v1/authorize?client_id={client_id}&response_type=code&redirect_uri={redirect_url}&scope={scope}"
 
     # get auth code by logging in
     print(f"Please Login to Webex by visiting {auth_url}")
@@ -35,7 +37,7 @@ def login() -> Tuple[str, str]:
     access_token = response.json()["access_token"]
     refresh_token = response.json()["refresh_token"]
 
-    print("Login successful!")
+    logger.info("Login successful!")
     return (access_token, refresh_token)
 
 
@@ -52,9 +54,11 @@ def refresh(refreshToken: str) -> Tuple[str, str]:
     }
 
     response = requests.post(token_url, data=options)
-    print(f"requesting refresh token received status {response.status_code}\n{response.json()["message"]}")
+    if(response.status_code != 200):
+        logger.error(f"requesting refresh token received status {response.status_code}\n{response.json()["message"]}")
+        return ("", "")
     access_token = response.json()["access_token"]
     refresh_token = response.json()["refresh_token"]
 
-    print("Got new token by using refresh token")
+    logger.info("Got new token by using refresh token")
     return (access_token, refresh_token)

@@ -1,28 +1,33 @@
 from dotenv import dotenv_values
-import requests
+import os
+import logging
+import coloredlogs
 import webex
 from login import login, refresh
 from util import root_dir
-import os
+
+logging.basicConfig(level=logging.DEBUG)
+coloredlogs.install(level='DEBUG')
+logger = logging.getLogger("webex-alert")
 
 accesstoken = ""
 refreshtoken = ""
 
+logger.info("Starting Webex Alert Script")
 # login or read tokens
 if os.path.exists(root_dir + "/.secrets"):
     secrets = dotenv_values(root_dir + "/.secrets")
     refreshtoken = secrets.get("REFRESH_TOKEN")
     accesstoken = secrets.get("ACCESS_TOKEN")
 else:
-    print("could not find .secrets file, starting login server...")
+    logger.info("could not find a .secrets file\nStarting login procedure...")
     accesstoken, refreshtoken = login()
     with open(root_dir + "/.secrets", "w") as f:
         f.write(f"ACCESS_TOKEN={accesstoken}\n")
         f.write(f"REFRESH_TOKEN={refreshtoken}\n")
 
 # check valid token
-res = requests.get("https://webexapis.com/v1/people/me",
-                   headers={"Authorization": f"Bearer {accesstoken}"})
+res = webex.Me(accesstoken)
 if res.status_code == 401:
     # use refresh token
     accesstoken, refreshtoken = refresh(refreshtoken)
@@ -30,14 +35,13 @@ if res.status_code == 401:
         f.write(f"ACCESS_TOKEN={accesstoken}\n")
         f.write(f"REFRESH_TOKEN={refreshtoken}\n")
 
-res = requests.get("https://webexapis.com/v1/people/me",
-                   headers={"Authorization": f"Bearer {accesstoken}"})
+res = webex.Me(accesstoken)
 if res.status_code != 200:
-    print("Could not authenticate, please try again")
+    logger.critical("Could not authenticate, please try again")
     os.remove(".secrets")
     exit()
 
-print("Logged in as " + res.json()["displayName"])
+logger.info("Logged in as " + res.json()["displayName"])
 emails = []
 exit()
 # get all emails
@@ -65,20 +69,20 @@ if not room_id:
 
 # add users to room by their Ids
 user_ids = webex.getUserIds(emails, accesstoken)
-print(f"Found {len(user_ids)} users")
+logger.info(f"Found {len(user_ids)} users")
 
 # get users already in that room
 room_users_ids = webex.getRoomUserIds(room_id, accesstoken)
-print(len(room_users_ids), "users already in room")
+logger.info(len(room_users_ids), "users already in room")
 
 user_ids = list(set(user_ids) - set(room_users_ids))
-print(len(user_ids), "users to add")
+logger.info(len(user_ids), "users to add")
 
 # add remaining users to room
 for user_id in user_ids:
     res = webex.addUserToRoom(user_id, room_id, accesstoken)
     if res.status_code != 200:
-        print(f"Could not add user {user_id} to room - statuscode: {res.status_code}")
+        logger.error(f"Could not add user {user_id} to room - statuscode: {res.status_code}")
 
 # (re-)grant mod rights
 special_users = ["jens.krumsieck@thuenen.de", "florian.hoedt@thuenen.de", "helge.ziese@thuenen.de", "beate.oerder@thuenen.de", "thomas.firley@thuenen.de"]
@@ -87,6 +91,6 @@ special_ids = webex.getUserIds(special_users, accesstoken)
 for user_id in special_ids:
     res = webex.grantModeratorRightsInRoom(user_id, room_id, accesstoken)
     if res.status_code != 200:
-        print(f"Could not grant user {user_id} moderator rights - statuscode: {res.status_code}")
+        logger.error(f"Could not grant user {user_id} moderator rights - statuscode: {res.status_code}")
     else:
-        print(f"Granted user {user_id} moderator rights")
+        logger.info(f"Granted user {user_id} moderator rights")
