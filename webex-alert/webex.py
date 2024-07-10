@@ -1,5 +1,6 @@
 import requests
 from typing import List
+from util import root_dir
 
 def getAllEmails(accesstoken: str):
     # get all colleagues
@@ -18,7 +19,7 @@ def getAllEmails(accesstoken: str):
 
     emails = list(set(emails))  # make unique list
     print(f"Found {len(emails)} emails")
-    with open("emails.txt", "w") as f:
+    with open(root_dir + "/emails.txt", "w") as f:
         for email in emails:
             f.write(email + "\n")            
     return emails

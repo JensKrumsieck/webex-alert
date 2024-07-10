@@ -2,19 +2,21 @@ from dotenv import dotenv_values
 import requests
 import webex
 from login import login, refresh
+from util import root_dir
 import os
 
 accesstoken = ""
 refreshtoken = ""
 
 # login or read tokens
-if os.path.exists(".secrets"):
-    secrets = dotenv_values(".secrets")
+if os.path.exists(root_dir + "/.secrets"):
+    secrets = dotenv_values(root_dir + "/.secrets")
     refreshtoken = secrets.get("REFRESH_TOKEN")
     accesstoken = secrets.get("ACCESS_TOKEN")
 else:
+    print("could not find .secrets file, starting login server...")
     accesstoken, refreshtoken = login()
-    with open(".secrets", "w") as f:
+    with open(root_dir + "/.secrets", "w") as f:
         f.write(f"ACCESS_TOKEN={accesstoken}\n")
         f.write(f"REFRESH_TOKEN={refreshtoken}\n")
 
@@ -24,7 +26,7 @@ res = requests.get("https://webexapis.com/v1/people/me",
 if res.status_code == 401:
     # use refresh token
     accesstoken, refreshtoken = refresh(refreshtoken)
-    with open(".secrets", "w") as f:
+    with open(root_dir + "/.secrets", "w") as f:
         f.write(f"ACCESS_TOKEN={accesstoken}\n")
         f.write(f"REFRESH_TOKEN={refreshtoken}\n")
 
@@ -37,7 +39,7 @@ if res.status_code != 200:
 
 print("Logged in as " + res.json()["displayName"])
 emails = []
-
+exit()
 # get all emails
 #emails = webex.getAllEmails(accesstoken) # uncomment to update all emails
 

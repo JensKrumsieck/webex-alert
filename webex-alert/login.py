@@ -2,11 +2,12 @@ from typing import Tuple
 from dotenv import dotenv_values
 import requests
 import serve
+from util import root_dir
 
 token_url = "https://webexapis.com/v1/access_token"
 
 def read_secrets() -> Tuple[str, str]:    
-    config = dotenv_values(".env")
+    config = dotenv_values(root_dir + "/.env")
     client_id = config.get("CLIENT_ID")
     client_secret = config.get("CLIENT_SECRET")
     return (client_id, client_secret)
@@ -51,6 +52,7 @@ def refresh(refreshToken: str) -> Tuple[str, str]:
     }
 
     response = requests.post(token_url, data=options)
+    print(f"requesting refresh token received status {response.status_code}\n{response.json()["message"]}")
     access_token = response.json()["access_token"]
     refresh_token = response.json()["refresh_token"]
 
