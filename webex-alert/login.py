@@ -1,20 +1,24 @@
+import os
 from typing import Tuple
 from dotenv import dotenv_values
 import requests
-import serve
 import logging
-from util import root_dir
+import serve
+import webex
+from util import log_method, root_dir
 
-logger = logging.getLogger("webex-alert:login")
+logger = logging.getLogger("webex-alert")
 
 token_url = "https://webexapis.com/v1/access_token"
 
+@log_method
 def read_secrets() -> Tuple[str, str]:    
     config = dotenv_values(root_dir + "/.env")
     client_id = config.get("CLIENT_ID")
     client_secret = config.get("CLIENT_SECRET")
     return (client_id, client_secret)
 
+@log_method
 def login() -> Tuple[str, str]:
     client_id, client_secret = read_secrets()
     scope = "spark:all%20spark:kms"
@@ -40,7 +44,7 @@ def login() -> Tuple[str, str]:
     logger.info("Login successful!")
     return (access_token, refresh_token)
 
-
+@log_method
 def refresh(refreshToken: str) -> Tuple[str, str]:
 
     client_id, client_secret = read_secrets()

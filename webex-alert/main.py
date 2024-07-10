@@ -1,49 +1,16 @@
-from dotenv import dotenv_values
 import os
 import logging
 import coloredlogs
 import webex
-from login import login, refresh
 from util import root_dir
 
-logging.basicConfig(level=logging.DEBUG)
-coloredlogs.install(level='DEBUG')
+coloredlogs.install(level='DEBUG', fmt="%(asctime)s [%(levelname)s] %(name)s: %(message)s")
 logger = logging.getLogger("webex-alert")
 
-accesstoken = ""
-refreshtoken = ""
-
 logger.info("Starting Webex Alert Script")
-# login or read tokens
-if os.path.exists(root_dir + "/.secrets"):
-    secrets = dotenv_values(root_dir + "/.secrets")
-    refreshtoken = secrets.get("REFRESH_TOKEN")
-    accesstoken = secrets.get("ACCESS_TOKEN")
-else:
-    logger.info("could not find a .secrets file\nStarting login procedure...")
-    accesstoken, refreshtoken = login()
-    with open(root_dir + "/.secrets", "w") as f:
-        f.write(f"ACCESS_TOKEN={accesstoken}\n")
-        f.write(f"REFRESH_TOKEN={refreshtoken}\n")
+accesstoken, refreshtoken = webex.authenticate()
 
-# check valid token
-res = webex.Me(accesstoken)
-if res.status_code == 401:
-    # use refresh token
-    accesstoken, refreshtoken = refresh(refreshtoken)
-    with open(root_dir + "/.secrets", "w") as f:
-        f.write(f"ACCESS_TOKEN={accesstoken}\n")
-        f.write(f"REFRESH_TOKEN={refreshtoken}\n")
-
-res = webex.Me(accesstoken)
-if res.status_code != 200:
-    logger.critical("Could not authenticate, please try again")
-    os.remove(".secrets")
-    exit()
-
-logger.info("Logged in as " + res.json()["displayName"])
 emails = []
-exit()
 # get all emails
 #emails = webex.getAllEmails(accesstoken) # uncomment to update all emails
 
@@ -69,14 +36,14 @@ if not room_id:
 
 # add users to room by their Ids
 user_ids = webex.getUserIds(emails, accesstoken)
-logger.info(f"Found {len(user_ids)} users")
+logger.info(f"Found %s users", len(user_ids))
 
 # get users already in that room
 room_users_ids = webex.getRoomUserIds(room_id, accesstoken)
-logger.info(len(room_users_ids), "users already in room")
+logger.info("%s users already in room", len(room_users_ids))
 
 user_ids = list(set(user_ids) - set(room_users_ids))
-logger.info(len(user_ids), "users to add")
+logger.info("%s users to add", len(user_ids))
 
 # add remaining users to room
 for user_id in user_ids:

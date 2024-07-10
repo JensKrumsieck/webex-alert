@@ -1,6 +1,7 @@
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import os
 import signal
+from util import log_method
 
 token = ""
 
@@ -18,7 +19,7 @@ class LoginHandler(BaseHTTPRequestHandler):
         pid = os.getpid()
         os.kill(pid, signal.SIGINT)
 
-
+@log_method
 def run(handler_class=LoginHandler, port=8080) -> str:
     server_address = ('', port)
     httpd = HTTPServer(server_address, handler_class)
