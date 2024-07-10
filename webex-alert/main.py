@@ -52,14 +52,14 @@ emails = ["jens.krumsieck@thuenen.de"]#, "florian.hoedt@thuenen.de", "harald.von
 # create room if not stored already
 room_id = ""
 
-if os.path.exists(".room_id"):
-    with open(".room_id", "r") as f:
+if os.path.exists(root_dir + "/.room_id"):
+    with open(root_dir + "/.room_id", "r") as f:
         room_id = f.readline()
 
 if not room_id:
     options= {"title": "[Test] IT Security Alerts", "isLocked": True, "isPublic": False, "isAnnouncementOnly": True, "description": "This Room is used to broadcast IT Security Alerts"}
     room = webex.createRoom(options, accesstoken)
-    with open(".room_id", "w") as f:
+    with open(root_dir + "/.room_id", "w") as f:
         f.write(room["id"])
     room_id = room["id"]
 
