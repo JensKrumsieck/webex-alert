@@ -4,7 +4,6 @@ from dotenv import dotenv_values
 import requests
 import logging
 import serve
-import webex
 from util import log_method, root_dir
 
 logger = logging.getLogger("webex-alert")
