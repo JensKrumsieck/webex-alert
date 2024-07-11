@@ -1,4 +1,3 @@
-import os
 from typing import Tuple
 from dotenv import dotenv_values
 import requests

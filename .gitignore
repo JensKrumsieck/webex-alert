@@ -3,6 +3,8 @@
 emails.txt
 emails*.txt
 .env_example
+config.ini
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
