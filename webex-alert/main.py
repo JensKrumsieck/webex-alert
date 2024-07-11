@@ -3,11 +3,12 @@ import coloredlogs
 import webex
 from config import Config
 
-coloredlogs.install(level='INFO', fmt="%(asctime)s [%(levelname)s] %(name)s: %(message)s")
+config = Config() # config object
+
+coloredlogs.install(level=config.get_log_level(), fmt="%(asctime)s [%(levelname)s] %(name)s: %(message)s")
 logger = logging.getLogger("webex-alert")
 
 logger.info("Starting Webex Alert Script")
-config = Config() # config object
 accesstoken, refreshtoken = webex.authenticate()
 
 emails = []

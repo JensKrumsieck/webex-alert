@@ -3,6 +3,7 @@ from typing import Any
 from util import root_dir
 
 default_section = "webex"
+log_section = "logging"
 mod_section = "moderators"
 
 class Config():
@@ -11,6 +12,19 @@ class Config():
         self.config.read(root_dir + "/config.ini")
         if not self.config.has_section(default_section):
             self.config.add_section(default_section)
+        if not self.config.has_section(mod_section):
+            self.config.add_section(mod_section)
+        if not self.config.has_section(log_section):
+            self.config.add_section(log_section)
+
+    def get_log_level(self):
+        try:
+            log_level = self.config.get(log_section, "log_level")
+        except:
+            log_level = "INFO"
+            self.config.set(log_section, "log_level", log_level)
+            self.save()
+        return log_level
 
     def get_room_id(self):
         try:

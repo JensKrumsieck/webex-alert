@@ -27,6 +27,9 @@ room_id = ACTUAL_ROOM_ID
 
 [moderators]
 moderators = emails@separated.xy,by@comma.de
+
+[logging]
+log_level = INFO
 ```
 if options are not given they will be inferred and added afterwards, except the moderators options which will be ignored if not given.
 
