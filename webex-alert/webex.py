@@ -1,4 +1,5 @@
 import os
+import time
 from dotenv import dotenv_values
 import requests
 import logging
@@ -132,7 +133,7 @@ def grantModeratorRightsInRoom(user_id: str, room_id: str, accesstoken: str):
         response.status_code = 404 # manually set to 404
         return response
     membership_id = response.json()["items"][0]["id"]
-    
+    time.sleep(1)
     # grant moderator rights
     return requests.put(f"https://webexapis.com/v1/memberships/{membership_id}", headers={"Authorization": f"Bearer {accesstoken}"}, 
                         json={"isModerator": True})
