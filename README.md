@@ -8,7 +8,19 @@ Upon the first run the script will ask for authentification. Click the provided 
 ## How to use
 ### Prerequisites
 To use the Webex API you need to register a new [integration app](https://developer.webex.com/my-apps/new/integration) or use the credentials of an existing one.
-For the login to work you need to enter http://localhost:8080/ into the Redirect URI(s) field. After creation of the integration a client id and a client secret will be presented. Copy client id and client secret in a file called `.env`, like in the example:
+For the login to work you need to enter the followig into the Redirect URI(s) field.
+```
+https://oauth-helper-a.wbx2.com/helperservice/v1/actions/device/callback
+https://oauth-helper-r.wbx2.com/helperservice/v1/actions/device/callback
+https://oauth-helper-k.wbx2.com/helperservice/v1/actions/device/callback
+```
+Futhermore the following scopes are needed:
+```
+spark-admin:people_read
+spark:all
+```
+
+After creation of the integration a client id and a client secret will be presented. Copy client id and client secret in a file called `.env`, like in the example:
 ```env
 CLIENT_ID=your_client_id
 CLIENT_SECRET=your_client_secret

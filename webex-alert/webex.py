@@ -6,16 +6,46 @@ import keyring
 from util import qrcode
 
 api_url = "https://webexapis.com/v1"
-session = {}
 
+
+def get_all_users():
+    """
+    Fetch all users from Webex API.
+    """
+    endpoint = f"{api_url}/people"
+    res = requests.get(endpoint, headers=_header())
+    return res.json()["items"]
+
+def create_room(title: str, description: str = ""):
+    """
+    Create a new room in Webex.
+    """
+    endpoint = f"{api_url}/rooms"
+    payload = {
+        "title": title,
+        "description": description
+    }
+    res = requests.post(endpoint, headers=_header(), json=payload)
+    return res.json()["id"]
+
+def get_room(title: str):
+    """
+    Get a room by its title.
+    """
+    endpoint = f"{api_url}/rooms"
+    res = requests.get(endpoint, headers=_header())
+    return next((room for room in res.json()["items"] if room["title"] == title), None) 
 
 def auth(client_id: str, client_secret: str):
-    res = me()
+    """
+    Authenticate with Webex API using OAuth2 Device Authorization Grant.
+    """
+    res = _me()
     if res.status_code == 401 and keyring.get_password("webex", "refresh_token"):
         _refresh_token(client_id, client_secret)
     elif res.status_code != 200:
         _login(client_id, client_secret)
-        res = me()
+        res = _me()
 
     if res.status_code == 200:
         print(f"Logged in as \033[1m{res.json()['displayName']}\033[0m")
@@ -24,11 +54,16 @@ def auth(client_id: str, client_secret: str):
         exit(1)
 
 
-def me():
+def _header():
+    return {"Authorization": f"Bearer {keyring.get_password('webex', 'access_token')}"}
+
+
+def _me():
     endpoint = f"{api_url}/people/me"
-    headers = {
-        "Authorization": f"Bearer {keyring.get_password('webex', 'access_token')}"}
-    return requests.get(endpoint, headers=headers)
+    return requests.get(endpoint, headers=_header())
+
+
+session = {}
 
 
 def _start_session(data):
@@ -67,7 +102,7 @@ def _login(client_id: str, client_secret: str):
     endpoint = f"{api_url}/device/authorize"
     payload = {
         "client_id": client_id,
-        "scope": "spark:all spark:kms",
+        "scope": "spark:all spark:kms spark-admin:people_read",
     }
     res = requests.post(endpoint, data=payload)
 
