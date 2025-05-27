@@ -14,6 +14,9 @@ def get_all_users():
     """
     endpoint = f"{api_url}/people"
     res = requests.get(endpoint, headers=_header())
+    if res.status_code != 200:
+        print(f"Failed to fetch users: {res.status_code} - {res.text}")
+        exit(1)
     return res.json()["items"]
 
 
@@ -51,6 +54,9 @@ def get_room(title: str) -> dict | None:
     """
     endpoint = f"{api_url}/rooms"
     res = requests.get(endpoint, headers=_header())
+    if res.status_code != 200:
+        print(f"Failed to get room: {res.status_code} - {res.text}")
+        exit(1)
     return next((room for room in res.json()["items"] if room["title"] == title), None)
 
 
