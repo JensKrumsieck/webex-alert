@@ -23,7 +23,7 @@ After creation of the integration a client id and a client secret will be presen
 ```env
 CLIENT_ID=your_client_id
 CLIENT_SECRET=your_client_secret
-MODERATORS=darthvader@jenskrumsieck-7xry.wbx.ai
+MODERATORS=emails@of.your moderators@for.room split@by.spaces
 ```
 ### Usage of Script
 First of all you need to install all python requirements
