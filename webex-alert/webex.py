@@ -16,25 +16,86 @@ def get_all_users():
     res = requests.get(endpoint, headers=_header())
     return res.json()["items"]
 
-def create_room(title: str, description: str = ""):
+
+def create_room(title: str, description: str = "", moderated: bool = True):
     """
     Create a new room in Webex.
     """
     endpoint = f"{api_url}/rooms"
     payload = {
         "title": title,
-        "description": description
+        "description": description,
+        "isLocked": moderated,
+        "isAnnouncementOnly": moderated
     }
     res = requests.post(endpoint, headers=_header(), json=payload)
-    return res.json()["id"]
+    if res.status_code != 200:
+        raise Exception(
+            f"Failed to create room: {res.status_code} - {res.text}")
 
-def get_room(title: str):
+
+def delete_room(room_id: str):
+    """
+    Delete a room by its ID.
+    """
+    endpoint = f"{api_url}/rooms/{room_id}"
+    res = requests.delete(endpoint, headers=_header())
+    if res.status_code != 204:
+        raise Exception(
+            f"Failed to delete room: {res.status_code} - {res.text}")
+
+
+def get_room(title: str) -> dict | None:
     """
     Get a room by its title.
     """
     endpoint = f"{api_url}/rooms"
     res = requests.get(endpoint, headers=_header())
-    return next((room for room in res.json()["items"] if room["title"] == title), None) 
+    return next((room for room in res.json()["items"] if room["title"] == title), None)
+
+
+def get_or_create_room(title: str, description: str = "") -> dict | None:
+    """
+    Get a room by its title, or create it if it doesn't exist.
+    """
+    # with this we assert the current admin user is in the room if it exists
+    room = get_room(title)
+    if not room:
+        create_room(title, description)
+        room = get_room(title)
+
+    if not room:
+        print(f"Could not find or create the room '{title}'.")
+        exit(1)
+
+    return room
+
+
+def user_is_in_room(user_id: str, room_id: str) -> bool:
+    """
+    Check if a user is in a specific room.
+    """
+    endpoint = f"{api_url}/memberships"
+    params = {"roomId": room_id, "personId": user_id}
+    res = requests.get(endpoint, headers=_header(), params=params)
+    return res.status_code == 200 and len(res.json()["items"]) > 0
+
+
+def add_user_to_room(user_id: str, room_id: str, mod: bool = False):
+    """
+    Add a user to a specific room.
+    """
+    endpoint = f"{api_url}/memberships"
+    payload = {
+        "roomId": room_id,
+        "personId": user_id,
+        "isModerator": mod
+    }
+    res = requests.post(endpoint, headers=_header(), json=payload)
+    if res.status_code != 200:
+        raise Exception(
+            f"Failed to add user to room: {res.status_code} - {res.text}")
+
 
 def auth(client_id: str, client_secret: str):
     """
