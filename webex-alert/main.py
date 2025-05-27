@@ -43,3 +43,5 @@ for user in users:
               ("moderator" if any(email in moderators for email in user["emails"]) else "member"))
         webex.add_user_to_room(
             user["id"], room["id"], any(email in moderators for email in user["emails"]))
+
+print(f"All users added to room '{room['title']}'.")
