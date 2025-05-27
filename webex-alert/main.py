@@ -6,7 +6,8 @@ import argparse
 
 parser = argparse.ArgumentParser(description="Webex Alert CLI")
 parser.add_argument("--logout", action="store_true", help="Logout from Webex")
-parser.add_argument("--delete", action="store_true", help="Delete Room in Webex")
+parser.add_argument("--delete", action="store_true",
+                    help="Delete Room in Webex")
 args = parser.parse_args()
 
 if args.logout:
@@ -35,9 +36,10 @@ room = webex.get_or_create_room(
 if not room:
     print("Could not find or create the room 'Thünen-Notfälle'.")
     exit(1)
-print(moderators)
+
 for user in users:
     if not webex.user_is_in_room(user["id"], room["id"]):
+        print(user["displayName"] + " will be added to room " + room["title"] + " as " +
+              ("moderator" if any(email in moderators for email in user["emails"]) else "member"))
         webex.add_user_to_room(
             user["id"], room["id"], any(email in moderators for email in user["emails"]))
-        print(user["displayName"] + " added to room " + room["title"] + " as " + ("moderator" if any(email in moderators for email in user["emails"]) else "member"))

@@ -92,7 +92,12 @@ def add_user_to_room(user_id: str, room_id: str, mod: bool = False):
         "isModerator": mod
     }
     res = requests.post(endpoint, headers=_header(), json=payload)
-    if res.status_code != 200:
+
+    # some users can not be added to rooms as moderators
+    if res.status_code == 403 and mod:
+        print(
+            "User could not be added as moderator, added as member instead.")
+    elif res.status_code != 200:
         raise Exception(
             f"Failed to add user to room: {res.status_code} - {res.text}")
 

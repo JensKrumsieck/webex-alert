@@ -36,3 +36,5 @@ When executing the script the first time, you will be prompted to login to Webex
 python webex-alert
 ```
 The script will add a room if it does not exists and will add all organization members to the room. Meanwhile it will add admin rights to all users specified.
+
+Moderators need to have `Erweiterter Messaging-Dienst` enabled in Webex Admin Panel to be added via API. Otherwise they can be added manually.
