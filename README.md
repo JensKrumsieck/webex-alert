@@ -3,7 +3,6 @@ Creates an Alert Room for Webex and adds all colleagues to it. The Room is a bro
 
 Upon the first run the script will ask for authentification. Click the provided link (in terminal) to login to Webex. Access and Refresh Tokens will be stored in a .secrets file. 
 
-> **[- WARNING -]** This will add all your Colleagues to a webex room
 
 ## How to use
 ### Prerequisites
@@ -38,3 +37,6 @@ python webex-alert
 The script will add a room if it does not exists and will add all organization members to the room. Meanwhile it will add admin rights to all users specified.
 
 Moderators need to have `Erweiterter Messaging-Dienst` enabled in Webex Admin Panel to be added via API. Otherwise they can be added manually.
+
+> [!NOTE]
+> For Testing you can get an *Admin Sandbox* here: https://developer.webex.com/admin/docs/developer-sandbox-guide
