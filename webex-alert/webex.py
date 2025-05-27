@@ -115,9 +115,12 @@ def auth(client_id: str, client_secret: str):
     res = _me()
     if res.status_code == 401 and keyring.get_password("webex", "refresh_token"):
         _refresh_token(client_id, client_secret)
-    elif res.status_code != 200:
+    elif res.status_code != 200 and res.status_code != 429:
         _login(client_id, client_secret)
         res = _me()
+    elif res.status_code == 429:
+        print("Rate limit exceeded. Please try again later.")
+        exit(1)
 
     if res.status_code == 200:
         print(f"Logged in as \033[1m{res.json()['displayName']}\033[0m")
