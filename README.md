@@ -3,6 +3,7 @@ Creates an Alert Room for Webex and adds all colleagues to it. The Room is a bro
 
 Upon the first run the script will ask for authentification. Click the provided link (in terminal) to login to Webex. Access and Refresh Tokens will be stored in a keyring. 
 
+The user executing this script needs to be a Webex Admin.
 
 ## How to use
 ### Prerequisites
@@ -19,12 +20,22 @@ spark-admin:people_read
 spark:all
 ```
 
-After creation of the integration a client id and a client secret will be presented. Copy client id and client secret in a file called `.env`, like in the example, also add the desired moderators email adresses separated by spaces:
+After creation of the integration a client id and a client secret will be presented. Copy client id and client secret in a file called `.env`, like in the example:
 ```env
 CLIENT_ID=your_client_id
 CLIENT_SECRET=your_client_secret
-MODERATORS=emails@of.your moderators@for.room split@by.spaces
 ```
+
+Create a File called `config.json` and add the following information: Room title & description as well as email adresses of users that will be granted moderator status upon creation.
+Moderators need to have `Erweiterter Messaging-Dienst` enabled in Webex Admin Panel to be added via API. Otherwise they can be added manually.
+```json
+{
+    "title": "My Emergency Channel",
+    "description": "Hello :3",
+    "moderators": ["emails@of.your", "moderators@for.room"]
+}
+```
+
 ### Usage of Script
 First of all you need to install all python requirements
 ``` bash
@@ -35,8 +46,6 @@ When executing the script the first time, you will be prompted to login to Webex
 python webex-alert
 ```
 The script will add a room if it does not exists and will add all organization members to the room. Meanwhile it will add admin rights to all users specified.
-
-Moderators need to have `Erweiterter Messaging-Dienst` enabled in Webex Admin Panel to be added via API. Otherwise they can be added manually.
 
 > [!NOTE]
 > For Testing you can get an *Admin Sandbox* here: https://developer.webex.com/admin/docs/developer-sandbox-guide

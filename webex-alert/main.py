@@ -1,3 +1,4 @@
+import json
 import os
 import dotenv
 import webex
@@ -16,25 +17,30 @@ if args.logout:
     print("Logged out from Webex.")
     exit(0)
 
+# load configuration
 dotenv.load_dotenv()
 client_id = os.getenv("CLIENT_ID")
 client_secret = os.getenv("CLIENT_SECRET")
-moderators = os.getenv("MODERATORS", "").split(" ")
+
+with open("config.json", mode='r') as f:
+    config = json.load(f)
+title = config["title"]
+description = config["description"]
+moderators = config["moderators"]
 
 webex.auth(client_id, client_secret)  # type: ignore
 
 if args.delete:
-    room = webex.get_room("Thünen-Notfälle")
+    room = webex.get_room(title)
     if room:
         webex.delete_room(room["id"])
         print(f"Room '{room['title']}' deleted.")
         exit(0)
 
 users = webex.get_all_users()
-room = webex.get_or_create_room(
-    "Thünen-Notfälle", "Notfallmeldungen für das Thünen-Institut")
+room = webex.get_or_create_room(title, description)
 if not room:
-    print("Could not find or create the room 'Thünen-Notfälle'.")
+    print(f"Could not find or create the room '{title}'.")
     exit(1)
 
 for user in users:
