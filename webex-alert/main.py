@@ -38,6 +38,7 @@ if args.delete:
         exit(0)
 
 users = webex.get_all_users()
+
 room = webex.get_or_create_room(title, description)
 if not room:
     print(f"Could not find or create the room '{title}'.")

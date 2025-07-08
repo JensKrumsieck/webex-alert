@@ -13,11 +13,23 @@ def get_all_users():
     Fetch all users from Webex API.
     """
     endpoint = f"{api_url}/people?max=1000"
-    res = requests.get(endpoint, headers=_header())
-    if res.status_code != 200:
-        print(f"Failed to fetch users: {res.status_code} - {res.text}")
-        exit(1)
-    return res.json()["items"]
+           
+    all_users = []
+    while endpoint:
+        res = requests.get(endpoint, headers=_header())
+        if res.status_code != 200:
+            print(f"Failed to fetch users: {res.status_code} - {res.text}")
+            exit(1)
+        data = res.json()
+        items = data.get("items", [])
+        all_users.extend(items)
+        
+        if res.links.get('next'):
+            endpoint = res.links.get('next')["url"]
+        else:
+            endpoint = None
+    
+    return all_users
 
 
 def create_room(title: str, description: str = "", moderated: bool = True):
