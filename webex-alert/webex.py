@@ -118,7 +118,7 @@ def add_user_to_room(user_id: str, room_id: str, mod: bool = False) -> bool:
     elif res.status_code != 200:
         if res.headers.get("Retry-After"):
             sleep_time = int(res.headers.get("Retry-After"))            
-            print(f"Rate Limit Exceeded: Waiting {res.headers.get("Retry-After")}s")
+            print(f"Rate Limit Exceeded: Waiting {sleep_time}s")
             time.sleep(sleep_time)
             return False
         raise Exception(
