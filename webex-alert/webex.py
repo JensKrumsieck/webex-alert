@@ -12,7 +12,7 @@ def get_all_users():
     """
     Fetch all users from Webex API.
     """
-    endpoint = f"{api_url}/people"
+    endpoint = f"{api_url}/people?max=1000"
     res = requests.get(endpoint, headers=_header())
     if res.status_code != 200:
         print(f"Failed to fetch users: {res.status_code} - {res.text}")
