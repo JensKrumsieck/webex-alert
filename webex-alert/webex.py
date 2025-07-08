@@ -99,7 +99,7 @@ def user_is_in_room(user_id: str, room_id: str) -> bool:
     return res.status_code == 200 and len(res.json()["items"]) > 0
 
 
-def add_user_to_room(user_id: str, room_id: str, mod: bool = False):
+def add_user_to_room(user_id: str, room_id: str, mod: bool = False) -> bool:
     """
     Add a user to a specific room.
     """
@@ -117,10 +117,13 @@ def add_user_to_room(user_id: str, room_id: str, mod: bool = False):
             "User could not be added as moderator, added as member instead.")
     elif res.status_code != 200:
         if res.headers.get("Retry-After"):
-            print(f"Rate Limit Exceeded: Wait {res.headers.get("Retry-After")}s")
+            sleep_time = int(res.headers.get("Retry-After"))            
+            print(f"Rate Limit Exceeded: Waiting {res.headers.get("Retry-After")}s")
+            time.sleep(sleep_time)
+            return False
         raise Exception(
             f"Failed to add user to room: {res.status_code} - {res.text}")
-
+    return True
 
 def auth(client_id: str, client_secret: str):
     """
