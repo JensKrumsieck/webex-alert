@@ -116,6 +116,8 @@ def add_user_to_room(user_id: str, room_id: str, mod: bool = False):
         print(
             "User could not be added as moderator, added as member instead.")
     elif res.status_code != 200:
+        if res.headers.get("Retry-After"):
+            print(f"Rate Limit Exceeded: Wait {res.headers.get("Retry-After")}s")
         raise Exception(
             f"Failed to add user to room: {res.status_code} - {res.text}")
 
