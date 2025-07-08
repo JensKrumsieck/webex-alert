@@ -46,7 +46,7 @@ if not room:
 
 for user in users:
     if not webex.user_is_in_room(user["id"], room["id"]):
-        if user.get("displayname"):
+        if "displayName" in user:
             print(user["displayName"] + " will be added to room " + room["title"] + " as " +
                 ("moderator" if any(email in moderators for email in user["emails"]) else "member"))
         else:
